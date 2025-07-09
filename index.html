@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Piggy Music 🎵</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #ffb6c1, #ffe4e1);
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      text-align: center;
+      padding: 20px;
+      color: #800000;
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      font-size: 1em;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      margin: 10px;
+      border-radius: 10px;
+      border: none;
+      background-color: #ff69b4;
+      color: white;
+      cursor: pointer;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      margin: 10px 0;
+      background: #fff0f5;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    audio {
+      margin-top: 20px;
+      width: 90%;
+    }
+  </style>
+</head>
+<body>
+  <h1>🐿 Piggy Music</h1>
+  <input type="text" id="busqueda" placeholder="Buscar canciones...">
+  <button onclick="buscarCanciones()">🔍 Buscar</button>
+  <ul id="listaCanciones"></ul>
+  <audio id="reproductor" controls></audio>
+
+  <script>
+    const CLIENT_ID = "971851e2";
+
+    function buscarCanciones() {
+      const query = document.getElementById("busqueda").value;
+      const lista = document.getElementById("listaCanciones");
+      const reproductor = document.getElementById("reproductor");
+      lista.innerHTML = "<li>Buscando...</li>";
+
+      fetch(`https://api.jamendo.com/v3.0/tracks/?client_id=${CLIENT_ID}&format=json&limit=10&search=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+          lista.innerHTML = "";
+          if (data.results.length === 0) {
+            lista.innerHTML = "<li>No se encontraron canciones.</li>";
+            return;
+          }
+          data.results.forEach(cancion => {
+            const item = document.createElement("li");
+            item.innerHTML = `<strong>${cancion.name}</strong><br><em>${cancion.artist_name}</em><br><button onclick=\"reproducir('${cancion.audio}')\">▶️ Reproducir</button>`;
+            lista.appendChild(item);
+          });
+        })
+        .catch(err => {
+          lista.innerHTML = "<li>Error al buscar canciones :(</li>";
+          console.error(err);
+        });
+    }
+
+    function reproducir(url) {
+      const reproductor = document.getElementById("reproductor");
+      reproductor.src = url;
+      reproductor.play();
+    }
+  </script>
+</body>
+</html>
